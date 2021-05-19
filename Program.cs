@@ -4,6 +4,7 @@ using System.Linq;
 using System.Diagnostics;
 using System.Net;
 using System.IO;
+using System.Text.Json;
 
 namespace example_questions_1
 {
@@ -13,14 +14,13 @@ namespace example_questions_1
         {
             #region Question 1
 
-            // Example data
-            //int[] a1 = new int[] { 1, 2, 3, 4, 5, 9, 10 };
-            //int[] a2 = new int[] { 1, 5, 6, 7, 8, 9, 10 };
-            int[] a1 = GetRandomIntArray(-50, 50, 100);
-            int[] a2 = GetRandomIntArray(-50, 50, 100);
-
             // Given two arrays of integers, find the common elements between them
-            FindCommonElements1(a1, a2);
+            int[] a1 = GetRandomIntArray(-25, 25, 100);
+            int[] a2 = GetRandomIntArray(-25, 25, 100);
+            // method 1
+            FindCommonElements(a1, a2, 0);
+            // method 2
+            FindCommonElements(a1, a2, 1);
 
             #endregion
 
@@ -32,96 +32,144 @@ namespace example_questions_1
 
         }
 
-        // question 1
-        // Given two arrays of integers, find the common elements between them
-        static int[] FindCommonElements1(int[] a1, int[] a2)
+        /// <summary>
+        /// Given two arrays of integers, find the common elements between them by looping through both arrays.
+        /// </summary>
+        /// <param name="a1">integer array 1</param>
+        /// <param name="a2">integer array 2</param>
+        /// <param name="method">method to use. 0 -> nested looping. 1 -> sort, iterate through.</param>
+        /// <returns>Returns an integer array of the common elements.</returns>
+        static int[] FindCommonElements(int[] a1, int[] a2, int method = 1)
         {
+            if (method == 0)
+            {
+                Console.WriteLine("Finding common elements between two arrays of integers using nested loops (inefficient):");
+            }
+            else if (method == 1)
+            {
+                Console.WriteLine("Finding common elements between two arrays of integers by sorting, then interating through (efficient):");
+            }
+
             // begin measuring elapsed time
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
+            // store the common elements
             List<int> commonElements = new List<int>();
-            Console.WriteLine("Finding common elements between two arrays of integers using nested loops:");
 
-            // check for null or empty arrays
-            if (!ValidateIntArrays(a1, a2))
+
+            // Check for null or empty arrays
+            if (a1 == null)
             {
+                Console.WriteLine("Array 1 is null.");
+                return commonElements.ToArray();
+            }
+            else if (a1.Length == 0)
+            {
+                Console.WriteLine("Array 1 is empty.");
+                return commonElements.ToArray();
+            }
+            if (a2 == null)
+            {
+                Console.WriteLine("Array 2 is null.");
+                return commonElements.ToArray();
+            }
+            else if (a2.Length == 0)
+            {
+                Console.WriteLine("Array 2 is empty.");
                 return commonElements.ToArray();
             }
             // print out the arrays
             else
             {
-                Console.Write("Array 1: ");
-                Console.Write(String.Join(", ", a1));
-                Console.WriteLine("");
-                Console.Write("Array 2: ");
-                Console.Write(String.Join(", ", a2));
-                Console.WriteLine("");
+                //Console.Write("Array 1: ");
+                //Console.Write(String.Join(", ", a1));
+                //Console.WriteLine("");
+                //Console.Write("Array 2: ");
+                //Console.Write(String.Join(", ", a2));
+                //Console.WriteLine("");
             }
 
-            // remove duplicates from the arrays
-            int[] array1 = a1.Distinct().ToArray();
-            int[] array2 = a2.Distinct().ToArray();
-
-            // loop through the first array
-            foreach (int i in array1)
+            // very inefficient, nested looping method
+            if (method == 0)
             {
-                // loop through the second array
-                foreach (int j in array2)
+                // remove duplicates
+                List<int> array1 = a1.Distinct().ToList();
+                List<int> array2 = a2.Distinct().ToList();
+
+                // loop through the first array
+                foreach (int i in array1)
                 {
-                    if (i == j)
+                    // loop through the second array
+                    foreach (int j in array2)
                     {
-                        commonElements.Add(i);
-                        continue;
+                        if (i == j)
+                        {
+                            commonElements.Add(i);
+                            continue;
+                        }
                     }
                 }
-            }
 
-            Console.Write("Common elements: ");
-            Console.Write(String.Join(", ", commonElements));
-            Console.WriteLine("");
+                commonElements.Sort();
+            }
+            // more efficient method
+            else if (method == 1)
+            {
+                // sort
+                List<int> list1 = a1.ToList();
+                list1.Sort();
+                int[] array1 = list1.ToArray<int>();
+
+                List<int> list2 = a2.ToList();
+                list2.Sort();
+                int[] array2 = list2.ToArray<int>();
+
+                // iterate through the arrays
+                int i = 0, j = 0;
+                while (i < array1.Length && j < array2.Length)
+                {
+                    if (array1[i] == array2[j])
+                    {
+                        commonElements.Add(array1[i]);
+                        i++;
+                        j++;
+                    }
+                    else if (array1[i] < array2[j])
+                    {
+                        i++;
+                    }
+                    else
+                    {
+                        j++;
+                    }
+                }
+
+                commonElements = commonElements.Distinct().ToList();
+            }
 
             // end measuring elapsed time
             watch.Stop();
+            
+            // print out result
+            Console.Write("Common elements: ");
+            Console.Write(String.Join(", ", commonElements));
+            Console.WriteLine("");
             Console.WriteLine("Calculation time: " + watch.ElapsedMilliseconds + "ms");
             Console.WriteLine("");
 
             return commonElements.ToArray();
         }
 
-        static bool ValidateIntArrays(int[] a1, int[] a2)
-        {
-            int[] array1 = a1;
-            int[] array2 = a2;
-
-            // Check for null or empty arrays
-            if (array1 == null)
-            {
-                Console.WriteLine("Array 1 is null");
-                return false;
-            }
-            else if (array1.Length == 0)
-            {
-                Console.WriteLine("Array 1 is empty");
-                return false;
-            }
-            if (array2 == null)
-            {
-                Console.WriteLine("Array 2 is null");
-                return false;
-            }
-            else if (array2.Length == 0)
-            {
-                Console.WriteLine("Array 2 is empty");
-                return false;
-            }
-            return true;
-        }
-
+        /// <summary>
+        /// uses random number API: http://www.randomnumberapi.com/ to get random numbers
+        /// </summary>
+        /// <param name="pMin">minimum possible number</param>
+        /// <param name="pMax">maximum possible number</param>
+        /// <param name="pCount">total of results</param>
+        /// <returns></returns>
         static int[] GetRandomIntArray(int pMin, int pMax, int pCount)
         {
-            int min;
-            int max;
-            int count;
+            int min, max, count;
             string URL = "http://www.randomnumberapi.com/api/v1.0/random?";
             int[] result = { };
 
@@ -141,42 +189,36 @@ namespace example_questions_1
                 min = pMin;
                 max = pMax;
             }
-            if (pCount <= 0 || pCount > 100)
+            if (pCount <= 0)
             {
-                count = 50;
+                count = 10;
             }
             else
             {
                 count = pCount;
             }
 
-            // complete the URL
-            URL += min + "&max=" + max + "&count=" + count;
-
+            // complete the URL and request the data from the API
+            URL += "min=" + min + "&max=" + max + "&count=" + count;
             WebRequest wrGETURL;
             wrGETURL = WebRequest.Create(URL);
 
-            WebProxy myProxy = new WebProxy("myproxy", 80);
-            myProxy.BypassProxyOnLocal = true;
-
-            // wrGETURL.Proxy = WebProxy.GetDefaultProxy();
-
+            // read in the result
             Stream objStream;
             objStream = wrGETURL.GetResponse().GetResponseStream();
-
             StreamReader objReader = new StreamReader(objStream);
 
-            string sLine = "";
-            int i = 0;
-
-            while (sLine != null)
+            // parse json to an int array
+            try
             {
-                i++;
-                sLine = objReader.ReadLine();
-                if (sLine != null)
-                    Console.WriteLine("{0}:{1}", i, sLine);
+                string jsonResult = objReader.ReadLine();
+                result = JsonSerializer.Deserialize<int[]>(jsonResult);
             }
-
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            
             return result;
         }
     }
