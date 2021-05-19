@@ -24,8 +24,15 @@ namespace example_questions_1
 
             #endregion
 
-            // question 2
+            #region Question 2
+
             // Given an array of integers, find all pairs of numbers that add to a given value
+            int[] a3 = GetRandomIntArray(0, 25, 25);
+            // method 1
+            FindSumPairs(a3, 25, 0);
+            // method 2
+
+            #endregion
 
             // question 3
             // Given a string, invert the positions of only the vowels
@@ -33,20 +40,22 @@ namespace example_questions_1
         }
 
         /// <summary>
-        /// Given two arrays of integers, find the common elements between them by looping through both arrays.
+        /// Given two arrays of integers, find the common elements between them.
+        /// Can use two different algorithms. 0 -> nested looping (inefficient). 1 -> sort, iterate through (efficient).
         /// </summary>
-        /// <param name="a1">integer array 1</param>
-        /// <param name="a2">integer array 2</param>
-        /// <param name="method">method to use. 0 -> nested looping. 1 -> sort, iterate through.</param>
-        /// <returns>Returns an integer array of the common elements.</returns>
+        /// <param name="a1"></param>
+        /// <param name="a2"></param>
+        /// <param name="method"></param>
+        /// <returns>Integer array of the common elements.</returns>
         static int[] FindCommonElements(int[] a1, int[] a2, int method = 1)
         {
             if (method == 0)
             {
                 Console.WriteLine("Finding common elements between two arrays of integers using nested loops (inefficient):");
             }
-            else if (method == 1)
+            else if (method != 0)
             {
+                method = 1;
                 Console.WriteLine("Finding common elements between two arrays of integers by sorting, then interating through (efficient):");
             }
 
@@ -55,7 +64,6 @@ namespace example_questions_1
 
             // store the common elements
             List<int> commonElements = new List<int>();
-
 
             // Check for null or empty arrays
             if (a1 == null)
@@ -158,6 +166,93 @@ namespace example_questions_1
             Console.WriteLine("");
 
             return commonElements.ToArray();
+        }
+
+        /// <summary>
+        /// Given an array of integers, find all pairs that sum to a given total.
+        /// Can use two different algorithms. 0 -> nested looping (inefficient). 1 -> PLACEHOLDER (efficient).
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="sum"></param>
+        /// <param name="method"></param>
+        /// <returns>2D integer array containing the pairs.</returns>
+        static int[][] FindSumPairs(int[] a, int sum, int method = 1)
+        {
+            if (method == 0)
+            {
+                Console.WriteLine("Finding pairs that sum to " + sum + " using nested loops (inefficient):");
+            }
+            else if (method != 0)
+            {
+                method = 1;
+                Console.WriteLine("Finding pairs that sum to " + sum + " (METHOD 2):");
+            }
+
+            // begin measuring elapsed time
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+
+            // store the pairs
+            List<int[]> sumPairs = new List<int[]>();
+
+            // check for null or empty array
+            if (a == null)
+            {
+                Console.WriteLine("Array is null.");
+                return sumPairs.ToArray();
+            }
+            else if (a.Length == 0)
+            {
+                Console.WriteLine("Array is empty.");
+                return sumPairs.ToArray();
+            }
+            else
+            {
+                Console.Write("Array: ");
+                Console.Write(String.Join(", ", a));
+                Console.WriteLine("");
+            }
+
+            // inefficient, nested looping method
+            if (method == 0)
+            {
+                // loop through every element
+                for (int i = 0; i < a.Length; i++)
+                {
+                    for (int j = 0; j < a.Length; j++)
+                    {
+                        // don't check an element against itself
+                        if (i == j)
+                        {
+                            continue;
+                        }
+                        else if (a[i] + a[j] == sum)
+                        {
+                            int[] newPair = { a[i], a[j] };
+                            sumPairs.Add(newPair);
+                        }
+                    }
+                }
+
+            }
+            else if (method == 1)
+            {
+
+            }
+
+            // end measuring elapsed time
+            watch.Stop();
+
+            // print out result
+            Console.WriteLine("Pairs: ");
+            foreach (int[] item in sumPairs)
+            {
+                Console.WriteLine(String.Join(", ", item));
+            }
+            Console.WriteLine("");
+            Console.WriteLine("Calculation time: " + watch.ElapsedMilliseconds + "ms");
+            Console.WriteLine("");
+
+            return sumPairs.ToArray();
         }
 
         /// <summary>
